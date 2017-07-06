@@ -1,0 +1,17 @@
+{
+  "name": "todo-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Me",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.3",
+    "lodash": "^4.17.4",
+    "mongodb": "^2.2.29",
+    "mongoose": "^4.11.1"
+  }
+}
