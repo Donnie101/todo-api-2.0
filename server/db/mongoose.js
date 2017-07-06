@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-var dbLink = process.env.MONGODB || 'mongodb://localhost/todoApp';
+
 mongoose.Promise = global.Promise;
-mongoose.connect(dbLink,{useMongoClient:true});
+mongoose.connect(process.env.MONGODB_HEROKU||process.env.MONGODB,{useMongoClient:true});
 
 module.exports = {mongoose};
