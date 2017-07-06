@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const {ObjectID} = require('mongodb');
 const {mongoose} = require('./db/mongoose');
 const {Todo} = require('./models/todo');
-const {User} = require('./models/User');
+const {User} = require('./models/user');
 
 
 app.use(bodyParser.json());
@@ -40,7 +40,7 @@ app.get('/todos/:id',(req,res)=>{
   Todo.findById(id).then((todo)=>{
     if(!todo){
       return res.sendStatus(404);
-    }  
+    }
     res.send(todo);
 
   },(err)=>{
