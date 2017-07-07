@@ -102,6 +102,8 @@ app.patch('/todos/:id',(req,res)=>{
 
 });
 
+//-------AUTHENTICATION-----//
+
 //USER SIGN UP
 app.post('/users',(req,res)=>{
   var body = _.pick(req.body,['email','password']);
