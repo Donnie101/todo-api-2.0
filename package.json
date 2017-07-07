@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "export NODE_ENV=test || SET \"NODE_ENV=test\" && mocha server/**/*.test.js",
+    "test": "SET \"NODE_ENV=test\" && mocha server/**/*.test.js",
     "start": "node server/server.js"
   },
   "author": "Me",
@@ -12,9 +12,11 @@
   "dependencies": {
     "body-parser": "^1.17.2",
     "express": "^4.15.3",
+    "jsonwebtoken": "^7.4.1",
     "lodash": "^4.17.4",
     "mongodb": "^2.2.29",
-    "mongoose": "^4.11.1"
+    "mongoose": "^4.11.1",
+    "validator": "^7.2.0"
   },
   "devDependencies": {
     "expect": "^1.20.2",
