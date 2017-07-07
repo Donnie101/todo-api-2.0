@@ -119,14 +119,34 @@ app.post('/users',(req,res)=>{
 
 });
 
-
-
-//USER LOGIN
+//SHOW USER
 app.get('/users/me',authenticate,(req,res)=>{
   res.send(req.user);
 });
 
 
+//USER LOGIN
+app.post('/users/login',(req,res)=>{
+  var user = _.pick(req.body,['email','password']);
+  User.findByCredentials(user.email,user.password).then((user)=>{
+
+    user.generateAuthToken().then((token)=>{
+      res.header('x-auth',token).send(user)
+    })
+  }).catch((err)=>{
+    res.sendStatus(400);
+  });
+});
+
+//USER LOG OUT
+app.delete('/users/me/logout',authenticate,(req,res)=>{
+
+  req.user.removeToken(req.token).then(()=>{
+    res.sendStatus(200);
+  },()=>{
+    res.sendStatus(400);
+  })
+});
 
 //SETING THE SERVER
 app.listen(process.env.PORT || 3000,()=>{

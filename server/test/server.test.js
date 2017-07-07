@@ -225,7 +225,9 @@ describe('POST/ users',()=>{
           expect(user).toExist();
           expect(user.password).toNotBe(password);
           done();
-        })
+        }).catch((err)=>{
+          done(err);
+        });
 
       });
   });
@@ -250,4 +252,77 @@ describe('POST/ users',()=>{
       .end(done);
   });
 
+});
+
+describe('POST/ users/login',()=>{
+  var user = users[1];
+  it('sould login user and return auth token',(done)=>{
+    request(app)
+      .post('/users/login')
+      .send(user)
+      .expect(200)
+      .expect((res)=>{
+        expect(res.headers['x-auth']).toExist();
+        expect(res.body._id).toBe(user._id.toHexString());
+      }).end((err,res)=>{
+        if(err)
+          return done(err)
+
+        User.findById({_id:user._id}).then((user)=>{
+          expect(user.tokens[0]).toInclude({
+            access:'auth',
+            token:res.headers['x-auth']
+          });
+          done();
+        }).catch((err)=>{
+          done(err);
+        });
+
+      });
+  });
+
+  it('sould reject invalid login',(done)=>{
+    var user = {email:users[1].email,password:''};
+    request(app)
+      .post('/users/login')
+      .send(user)
+      .expect(400)
+      .expect((res)=>{
+        expect(res.headers['x-auth']).toNotExist();
+        expect(res.body._id).toNotExist();
+      }).end((err,res)=>{
+        if(err)
+          return done(err);
+
+          User.findById({_id:users[1]._id}).then((user)=>{
+            expect(user.tokens.length).toBe(0);
+            done();
+          }).catch((err)=>{
+            done(err);
+          });
+
+      });
+  });
+
+});
+
+describe('DELETE/ users/me/logout',()=>{
+  it('should remove auth token on logout',(done)=>{
+    var user = users[0];
+    request(app)
+      .delete('/users/me/logout')
+      .set('x-auth',user.tokens[0].token)
+      .expect(200)
+      .end((err,res)=>{
+        if(err)
+          return done(err);
+
+        User.findById({_id:user._id}).then((user)=>{
+          expect(user.tokens.length).toBe(0);
+          done();
+        }).catch((err)=>{
+          done(err);
+        });
+      })
+  });
 });
