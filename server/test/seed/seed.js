@@ -13,25 +13,31 @@ const users = [
     password:'userOnepass',
     tokens:[{
       access:'auth',
-      token:jwt.sign({_id:userOneId,access:'auth'},'thesecret').toString()
+      token:jwt.sign({_id:userOneId,access:'auth'},process.env.JWT_SECRET).toString()
     }]
   },
   {
     _id:userTwoId,
     email:'userTwo@gmail.com',
-    password:'userTowPassword'
+    password:'userTowPassword',
+    tokens:[{
+      access:'auth',
+      token:jwt.sign({_id:userTwoId,access:'auth'},process.env.JWT_SECRET).toString()
+    }]
   }
 ];
 
 const todos = [
   {
     _id: new ObjectID(),
-    text:'testing todos 1'
+    text:'testing todos 1',
+    _creator:userOneId
 
   },
   {
     _id: new ObjectID(),
     text:'testing todos 2',
+    _creator:userTwoId,
     completed:true,
     completedAt:666
   }

@@ -15,8 +15,13 @@ const {authenticate} = require('./middleware/authenticate');
 app.use(bodyParser.json());
 
 //ADD A TODO
-app.post('/todos',(req,res)=>{
-  Todo.create(req.body).then((todo)=>{
+app.post('/todos',authenticate,(req,res)=>{
+  var todo = new Todo({
+    _creator:req.user._id,
+    text:req.body.text
+  });
+
+  todo.save().then((todo)=>{
     res.send(todo);
   },(err)=>{
     res.sendStatus(400);
@@ -26,9 +31,11 @@ app.post('/todos',(req,res)=>{
 });
 
 //GET ALL TODOS
-app.get('/todos',(req,res)=>{
+app.get('/todos',authenticate,(req,res)=>{
 
-  Todo.find({}).then((todos)=>{
+  Todo.find({
+    _creator:req.user._id
+  }).then((todos)=>{
     res.send({todos})
   },(err)=>{
     res.sendStatus(400);
@@ -38,14 +45,17 @@ app.get('/todos',(req,res)=>{
 });
 
 //GET TODO BY ID
-app.get('/todos/:id',(req,res)=>{
+app.get('/todos/:id',authenticate,(req,res)=>{
   var id = req.params.id;
 
   if(!ObjectID.isValid(id)){
     return res.sendStatus(404);
   }
 
-  Todo.findById(id).then((todo)=>{
+  Todo.findOne({
+    _id:id,
+    _creator:req.user._id
+  }).then((todo)=>{
     if(!todo){
       return res.sendStatus(404);
     }
@@ -57,14 +67,17 @@ app.get('/todos/:id',(req,res)=>{
 });
 
 //DELETE TODO BY ID
-app.delete('/todos/:id',(req,res)=>{
+app.delete('/todos/:id',authenticate,(req,res)=>{
   var id = req.params.id;
 
   if(!ObjectID.isValid(id)){
     return res.sendStatus(404);
   }
 
-  Todo.findByIdAndRemove(id).then((todo)=>{
+  Todo.findOneAndRemove({
+    _id:id,
+    _creator:req.user._id
+  }).then((todo)=>{
     if(!todo){
       return res.sendStatus(404);
     }
@@ -76,7 +89,7 @@ app.delete('/todos/:id',(req,res)=>{
 });
 
 //UPDATE TODO
-app.patch('/todos/:id',(req,res)=>{
+app.patch('/todos/:id',authenticate,(req,res)=>{
   var id = req.params.id;
   var body = _.pick(req.body,['text','completed']);
 
@@ -91,7 +104,10 @@ app.patch('/todos/:id',(req,res)=>{
     body.completedAt = null;
   }
 
-  Todo.findByIdAndUpdate(id,{$set:body},{new:true}).then((todo)=>{
+  Todo.findOneAndUpdate({
+    _id:id,
+    _creator:req.user._id
+  },{$set:body},{new:true}).then((todo)=>{
     if(!todo)
       return res.sendStatus(404);
 
